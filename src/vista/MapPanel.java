@@ -72,7 +72,8 @@ public class MapPanel extends JPanel {
             Color color = (p.getRegion() > 0 && p.getRegion() < coloresRegiones.length) 
                           ? coloresRegiones[p.getRegion()] : Color.DARK_GRAY;
             
-            MapMarkerDot marker = new MapMarkerDot(p.getNombre(), new Coordinate(p.getLatitud(), p.getLongitud()));
+            String texto = p.getNombre() + " (" + p.getId() + ")";
+            MapMarkerDot marker = new MapMarkerDot(texto, new Coordinate(p.getLatitud(), p.getLongitud()));
             marker.setBackColor(color);
             mapViewer.addMapMarker(marker);
         }
