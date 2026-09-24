@@ -2,6 +2,7 @@ package presentador;
 
 import modelo.AlgoritmoKruskal;
 import modelo.Grafo;
+import modelo.Provincia;
 import modelo.Regionalizador;
 import vista.MainFrame;
 
@@ -17,12 +18,11 @@ public class MainPresenter {
         this.vista = vista;
         this.grafoOriginal = new Grafo();
 
-        // 1. Suscribir listeners a las acciones de la vista[cite: 7]
         this.vista.addAgregarProvinciaListener(e -> agregarProvincia());
         this.vista.addAgregarAristaListener(e -> agregarArista());
         this.vista.addCalcularRegionesListener(e -> calcularRegiones());
+        this.vista.addVerOriginalListener(e -> mostrarGrafoOriginal());
 
-        // 2. Escuchar clics sobre el mapa para autocompletar coordenadas en los campos de texto
         this.vista.getMapPanel().setMapPanelListener((lat, lon) -> {
             this.vista.setCoordenadasClickeadas(lat, lon);
         });
@@ -69,18 +69,26 @@ public class MainPresenter {
 
             int k = vista.getKValue();
             
-            // 1. Calcular el AGM mediante el Algoritmo de Kruskal
             agmActual = AlgoritmoKruskal.calcularAGM(grafoOriginal);
             
-            // 2. Eliminar k-1 aristas pesadas y marcar las k componentes conexas (regiones) con BFS[cite: 9]
             Regionalizador.generarRegiones(agmActual, k);
 
-            // 3. Notificar a la vista pasiva para actualizar el mapa[cite: 7]
             actualizarVistaMapa();
             vista.mostrarMensaje("Regiones generadas exitosamente para k = " + k);
         } catch (Exception ex) {
             vista.mostrarMensaje("Error al calcular regiones: " + ex.getMessage());
         }
+    }
+    
+    public void mostrarGrafoOriginal() {
+        this.agmActual = null;
+
+        for (Provincia p : grafoOriginal.getProvincias()) {
+            p.setRegion(0);
+        }
+
+        actualizarVistaMapa();
+        vista.mostrarMensaje("Se ha vuelto a la visualización del grafo original.");
     }
 
     private void actualizarVistaMapa() {
