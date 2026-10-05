@@ -35,7 +35,7 @@ public class MainPresenter {
             double lon = Double.parseDouble(vista.getLongitud());
 
             int newId = grafoOriginal.agregarProvincia(nombre, lat, lon);
-            vista.mostrarMensaje("Provincia '" + nombre + "' agregada con �xito. ID: " + newId);
+            vista.mostrarMensaje("Provincia '" + nombre + "' agregada con éxito. ID: " + newId);
             recalcularSiCorresponde();
         } catch (NumberFormatException ex) {
             vista.mostrarMensaje("Error: Las coordenadas (latitud y longitud) deben ser valores numéricos válidos.");
@@ -56,7 +56,7 @@ public class MainPresenter {
         } catch (NumberFormatException ex) {
             vista.mostrarMensaje("Error: Los IDs y el peso deben ser valores numéricos.");
         } catch (Exception ex) {
-            vista.mostrarMensaje("Error al agregar conexi�n: " + ex.getMessage());
+            vista.mostrarMensaje("Error al agregar conexión: " + ex.getMessage());
         }
     }
 
