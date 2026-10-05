@@ -35,10 +35,10 @@ public class MainPresenter {
             double lon = Double.parseDouble(vista.getLongitud());
 
             int newId = grafoOriginal.agregarProvincia(nombre, lat, lon);
-            vista.mostrarMensaje("Provincia '" + nombre + "' agregada con éxito. ID: " + newId);
-            actualizarVistaMapa();
+            vista.mostrarMensaje("Provincia '" + nombre + "' agregada con ï¿½xito. ID: " + newId);
+            recalcularSiCorresponde();
         } catch (NumberFormatException ex) {
-            vista.mostrarMensaje("Error: Las coordenadas (latitud y longitud) deben ser valores numéricos válidos.");
+            vista.mostrarMensaje("Error: Las coordenadas (latitud y longitud) deben ser valores numÃ©ricos vÃ¡lidos.");
         } catch (Exception ex) {
             vista.mostrarMensaje("Error al agregar provincia: " + ex.getMessage());
         }
@@ -51,12 +51,12 @@ public class MainPresenter {
             double peso = Double.parseDouble(vista.getPesoArista());
 
             grafoOriginal.agregarArista(origen, destino, peso);
-            vista.mostrarMensaje("Conexión entre " + origen + " y " + destino + " agregada correctamente.");
-            actualizarVistaMapa();
+            vista.mostrarMensaje("ConexiÃ³n entre " + origen + " y " + destino + " agregada correctamente.");
+            recalcularSiCorresponde();
         } catch (NumberFormatException ex) {
-            vista.mostrarMensaje("Error: Los IDs y el peso deben ser valores numéricos.");
+            vista.mostrarMensaje("Error: Los IDs y el peso deben ser valores numÃ©ricos.");
         } catch (Exception ex) {
-            vista.mostrarMensaje("Error al agregar conexión: " + ex.getMessage());
+            vista.mostrarMensaje("Error al agregar conexiï¿½n: " + ex.getMessage());
         }
     }
 
@@ -88,12 +88,20 @@ public class MainPresenter {
         }
 
         actualizarVistaMapa();
-        vista.mostrarMensaje("Se ha vuelto a la visualización del grafo original.");
+        vista.mostrarMensaje("Se ha vuelto a la visualizaciÃ³n del grafo original.");
     }
 
     private void actualizarVistaMapa() {
         // Muestra el AGM regionalizado si existe, o el grafo original en caso contrario
         Grafo grafoADibujar = (agmActual != null) ? agmActual : grafoOriginal;
         vista.getMapPanel().actualizarDatos(grafoADibujar.getProvincias(), grafoADibujar.getAristas());
+    }
+    
+    private void recalcularSiCorresponde() {
+        if (agmActual != null) {
+            agmActual = AlgoritmoKruskal.calcularAGM(grafoOriginal);
+            Regionalizador.generarRegiones(agmActual, vista.getKValue());
+        }
+        actualizarVistaMapa();
     }
 }
