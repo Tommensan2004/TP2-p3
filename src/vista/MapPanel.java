@@ -31,7 +31,14 @@ public class MapPanel extends JPanel {
 
     public MapPanel() {
         setLayout(new java.awt.BorderLayout());
-        mapViewer = new JMapViewer();
+        // Las aristas se dibujan dentro del mapa, para evitar que se borren al hacer zoom o mover el mapa
+        mapViewer = new JMapViewer() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                dibujarAristas(g);
+            }
+        };
         mapViewer.setDisplayPosition(new Coordinate(-38.416097, -63.616672), 4); // Centrado en Argentina
         add(mapViewer, java.awt.BorderLayout.CENTER);
 
@@ -62,7 +69,7 @@ public class MapPanel extends JPanel {
         this.aristas = aristas;
         mapViewer.removeAllMapMarkers();
 
-        // Color por cada región asignada
+        // Color por cada regiÃ³n asignada
         Color[] coloresRegiones = {
             Color.BLACK, Color.RED, Color.BLUE, Color.GREEN, 
             Color.ORANGE, Color.MAGENTA, Color.CYAN, Color.PINK
@@ -80,10 +87,7 @@ public class MapPanel extends JPanel {
         repaint();
     }
 
-    @Override
-    public void paint(Graphics g) {
-        super.paint(g);
-        // Dibujar las aristas/conexiones directamente sobre el mapa
+    private void dibujarAristas(Graphics g) {
         if (provincias != null && aristas != null) {
             Graphics2D g2d = (Graphics2D) g.create();
             g2d.setColor(Color.BLUE);
