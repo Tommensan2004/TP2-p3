@@ -1,9 +1,11 @@
 package vista;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Stroke;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -19,7 +21,13 @@ import modelo.Provincia;
 
 public class MapPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
-	
+
+    // Color por cada región asignada
+    private static final Color[] COLORES_REGIONES = {
+        Color.BLACK, Color.RED, Color.BLUE, Color.GREEN,
+        Color.ORANGE, Color.MAGENTA, Color.CYAN, Color.PINK
+    };
+
     private JMapViewer mapViewer;
     private List<Provincia> provincias;
     private List<Arista> aristas;
@@ -69,16 +77,9 @@ public class MapPanel extends JPanel {
         this.aristas = aristas;
         mapViewer.removeAllMapMarkers();
 
-        // Color por cada región asignada
-        Color[] coloresRegiones = {
-            Color.BLACK, Color.RED, Color.BLUE, Color.GREEN, 
-            Color.ORANGE, Color.MAGENTA, Color.CYAN, Color.PINK
-        };
-
         for (Provincia p : provincias) {
-            Color color = (p.getRegion() > 0 && p.getRegion() < coloresRegiones.length) 
-                          ? coloresRegiones[p.getRegion()] : Color.DARK_GRAY;
-            
+            Color color = colorDeRegion(p.getRegion());
+
             String texto = p.getNombre() + " (" + p.getId() + ")";
             MapMarkerDot marker = new MapMarkerDot(texto, new Coordinate(p.getLatitud(), p.getLongitud()));
             marker.setBackColor(color);
@@ -87,11 +88,17 @@ public class MapPanel extends JPanel {
         repaint();
     }
 
+    private Color colorDeRegion(int region) {
+        return (region > 0 && region < COLORES_REGIONES.length)
+                ? COLORES_REGIONES[region] : Color.DARK_GRAY;
+    }
+
     private void dibujarAristas(Graphics g) {
         if (provincias != null && aristas != null) {
             Graphics2D g2d = (Graphics2D) g.create();
-            g2d.setColor(Color.BLUE);
-            g2d.setStroke(new java.awt.BasicStroke(2));
+            Stroke lineaContinua = new BasicStroke(2);
+            Stroke lineaPunteada = new BasicStroke(1.5f, BasicStroke.CAP_BUTT,
+                    BasicStroke.JOIN_MITER, 10f, new float[] {6f, 6f}, 0f);
 
             for (Arista a : aristas) {
                 Provincia orig = provincias.get(a.getOrigen());
@@ -99,10 +106,27 @@ public class MapPanel extends JPanel {
 
                 Point p1 = mapViewer.getMapPosition(orig.getLatitud(), orig.getLongitud(), false);
                 Point p2 = mapViewer.getMapPosition(dest.getLatitud(), dest.getLongitud(), false);
-
-                if (p1 != null && p2 != null) {
-                    g2d.drawLine(p1.x, p1.y, p2.x, p2.y);
+                if (p1 == null || p2 == null) {
+                    continue;
                 }
+
+                int regionOrig = orig.getRegion();
+                int regionDest = dest.getRegion();
+
+                if (regionOrig == 0 && regionDest == 0) {
+                    // Grafo original
+                    g2d.setColor(Color.BLUE);
+                    g2d.setStroke(lineaContinua);
+                } else if (regionOrig == regionDest) {
+                    // Aristas con colores correspondientes
+                    g2d.setColor(colorDeRegion(regionOrig));
+                    g2d.setStroke(lineaContinua);
+                } else {
+                    // Arista punteada para marcar separacion de regiones
+                    g2d.setColor(Color.GRAY);
+                    g2d.setStroke(lineaPunteada);
+                }
+                g2d.drawLine(p1.x, p1.y, p2.x, p2.y);
             }
             g2d.dispose();
         }
