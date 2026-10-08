@@ -16,7 +16,7 @@ public class Regionalizador {
             throw new IllegalArgumentException("El valor de k debe estar entre 1 y " + n);
         }
 
-        // 1. Obtener las aristas del AGM y ordenarlas para descartar las k - 1 más pesadas
+        // Obtener las aristas del AGM y ordenarlas para descartar las k - 1 más pesadas
         List<Arista> aristasAGM = new ArrayList<>(agm.getAristas());
         Collections.sort(aristasAGM);
 
@@ -32,7 +32,7 @@ public class Regionalizador {
             bosqueResultante.agregarArista(a.getOrigen(), a.getDestino(), a.getPeso());
         }
 
-        // 2. BFS para marcar componentes conexas
+        // BFS para marcar componentes conexas
         Set<Integer> visitados = new HashSet<>();
         int idRegionActual = 1;
 
